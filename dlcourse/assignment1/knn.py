@@ -56,7 +56,6 @@ class KNN:
         dists = np.zeros((num_test, num_train), np.float32)
         for i_test in range(num_test):
             for i_train in range(num_train):
-                # TODO: Fill dists[i_test][i_train]
                 dists[i_test, i_train] = np.sum(np.abs(X[i_test] - self.train_X[i_train]))
         return dists
 
@@ -76,8 +75,6 @@ class KNN:
         num_test = X.shape[0]
         dists = np.zeros((num_test, num_train), np.float32)
         for i_test in range(num_test):
-            # TODO: Fill the whole row of dists[i_test]
-            # without additional loops or list comprehensions
             dists[i_test] = np.sum(np.abs(X[i_test] - self.train_X), axis=1)
         return dists
 
@@ -96,8 +93,6 @@ class KNN:
         num_train = self.train_X.shape[0]
         num_test = X.shape[0]
         # Using float32 to to save memory - the default is float64
-        # dists = np.zeros((num_test, num_train), np.float32)
-        # TODO: Implement computing all distances with no loops!
         dists = np.sum(np.abs(X[:, None, :] - self.train_X[None, :, :]), axis=2)
         return dists
 
@@ -116,8 +111,6 @@ class KNN:
         num_test = dists.shape[0]
         pred = np.zeros(num_test, np.bool)
         for i in range(num_test):
-            # TODO: Implement choosing best class based on k
-            # nearest training samples
             nearests = sorted(list(zip(dists[i], self.train_y)))
             nearest_targets = [target for (_, target) in nearests[:self.k]]
             pred[i] = Counter(nearest_targets).most_common(1)[0][0]
@@ -139,8 +132,6 @@ class KNN:
         num_test = dists.shape[0]
         pred = np.zeros(num_test, np.int)
         for i in range(num_test):
-            # TODO: Implement choosing best class based on k
-            # nearest training samples
             nearests = sorted(list(zip(dists[i], self.train_y)))
             nearest_targets = [target for (_, target) in nearests[:self.k]]
             pred[i] = Counter(nearest_targets).most_common(1)[0][0]

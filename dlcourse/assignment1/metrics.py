@@ -13,11 +13,6 @@ def binary_classification_metrics(prediction, ground_truth):
     Returns:
     precision, recall, f1, accuracy - classification metrics
     '''
-    # TODO: implement metrics!
-    # Some helpful links:
-    # https://en.wikipedia.org/wiki/Precision_and_recall
-    # https://en.wikipedia.org/wiki/F1_score
-
     tp = 0
     fp = 0
     tn = 0
@@ -48,6 +43,5 @@ def multiclass_accuracy(prediction, ground_truth):
     accuracy - ratio of accurate predictions to total samples
     
     '''
-    # TODO: Implement computing accuracy
     conf_mat = confusion_matrix(ground_truth, prediction)
     return np.sum(np.diag(conf_mat)) / np.sum(conf_mat)
