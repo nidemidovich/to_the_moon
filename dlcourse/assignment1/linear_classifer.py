@@ -112,8 +112,7 @@ class LinearSoftmaxClassifier():
     def __init__(self):
         self.W = None
 
-    def fit(self, X, y, batch_size=100, learning_rate=1e-7, reg=1e-5,
-            epochs=1):
+    def fit(self, X, y, batch_size=100, learning_rate=1e-7, reg=1e-5, epochs=1, verbose=False):
         '''
         Trains linear classifier
         
@@ -124,6 +123,7 @@ class LinearSoftmaxClassifier():
           learning_rate, float - learning rate for gradient descent
           reg, float - L2 regularization strength
           epochs, int - number of epochs
+          verbose, bool - controls the verbosity when fitting and predicting.
         '''
 
         num_train = X.shape[0]
@@ -139,15 +139,16 @@ class LinearSoftmaxClassifier():
             sections = np.arange(batch_size, num_train, batch_size)
             batches_indices = np.array_split(shuffled_indices, sections)
 
-            # TODO implement generating batches from indices
-            # Compute loss and gradients
-            # Apply gradient to weights using learning rate
-            # Don't forget to add both cross-entropy loss
-            # and regularization!
-            raise Exception("Not implemented!")
-
-            # end
-            print("Epoch %i, loss: %f" % (epoch, loss))
+            for idx in batches_indices:
+              batch_X = X[idx, :]
+              batch_y = y[idx]
+              loss_softmax, dW_softmax = linear_softmax(batch_X, self.W, batch_y)
+              loss_reg, grad_reg = l2_regularization(self.W, reg)
+              loss = loss_softmax + loss_reg
+              self.W -= learning_rate * (dW_softmax + grad_reg)
+            loss_history.append(loss)
+            if verbose:
+              print("Epoch %i, loss: %f" % (epoch, loss))
 
         return loss_history
 
@@ -161,11 +162,7 @@ class LinearSoftmaxClassifier():
         Returns:
           y_pred, np.array of int (test_samples)
         '''
-        y_pred = np.zeros(X.shape[0], dtype=np.int)
-
-        # TODO Implement class prediction
-        # Your final implementation shouldn't have any loops
-        raise Exception("Not implemented!")
+        y_pred = X.dot(self.W).argmax(axis=1)
 
         return y_pred
 
