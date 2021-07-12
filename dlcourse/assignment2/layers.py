@@ -53,9 +53,9 @@ def cross_entropy_loss(probs, target_index):
       loss: single value
     '''
     if probs.ndim > 1:
-      return -np.sum(np.log(probs[np.arange(len(target_index)), target_index.T]))
+      return -np.mean(np.log(probs[np.arange(len(target_index)), target_index.T]))
     
-    return -np.sum(np.log(probs[target_index]))
+    return -np.mean(np.log(probs[target_index]))
 
 
 def softmax_with_cross_entropy(preds, target_index):
@@ -82,7 +82,7 @@ def softmax_with_cross_entropy(preds, target_index):
     else:
       ground_truth[target_index] = 1
     
-    d_preds = probs - ground_truth
+    d_preds = (probs - ground_truth) / preds.shape[0]
 
     return loss, d_preds
 
