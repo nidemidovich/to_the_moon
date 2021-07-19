@@ -32,8 +32,8 @@ def softmax(predictions):
         probability for every class, 0..1
     '''
     if predictions.ndim > 1:
-      fixed_predictions = predictions - np.max(predictions, axis=1).reshape(-1, 1)
-      return np.exp(fixed_predictions) / np.sum(np.exp(fixed_predictions), axis=1).reshape(-1, 1)
+        fixed_predictions = predictions - np.max(predictions, axis=1).reshape(-1, 1)
+        return np.exp(fixed_predictions) / np.sum(np.exp(fixed_predictions), axis=1).reshape(-1, 1)
     
     fixed_predictions = predictions - np.max(predictions)
     return np.exp(fixed_predictions) / np.sum(np.exp(fixed_predictions))
@@ -53,7 +53,7 @@ def cross_entropy_loss(probs, target_index):
       loss: single value
     '''
     if probs.ndim > 1:
-      return -np.mean(np.log(probs[np.arange(len(target_index)), target_index.T]))
+        return -np.mean(np.log(probs[np.arange(len(target_index)), target_index.T]))
     
     return -np.mean(np.log(probs[target_index]))
 
@@ -78,9 +78,9 @@ def softmax_with_cross_entropy(preds, target_index):
     ground_truth = np.zeros(preds.shape)
     
     if ground_truth.ndim > 1:
-      ground_truth[np.arange(len(target_index)), target_index.T] = 1
+        ground_truth[np.arange(len(target_index)), target_index.T] = 1
     else:
-      ground_truth[target_index] = 1
+        ground_truth[target_index] = 1
     
     d_preds = (probs - ground_truth) / preds.shape[0]
 
@@ -263,16 +263,37 @@ class MaxPoolingLayer:
         self.X = None
 
     def forward(self, X):
+        self.X = X
         batch_size, height, width, channels = X.shape
-        # TODO: Implement maxpool forward pass
-        # Hint: Similarly to Conv layer, loop on
-        # output x/y dimension
-        raise Exception("Not implemented!")
+        
+        out_height = int((height - self.pool_size) / self.stride + 1)
+        out_width = int((width - self.pool_size) / self.stride + 1)
+
+        V = np.zeros((batch_size, out_height, out_width, channels))
+
+        for y in range(out_height):
+            for x in range(out_width):
+                X_slice = X[:, y:y+self.pool_size, x:x+self.pool_size, :]
+                V[:, y, x, :] = np.amax(X_slice, axis=(1, 2))
+
+        return V
 
     def backward(self, d_out):
-        # TODO: Implement maxpool backward pass
         batch_size, height, width, channels = self.X.shape
-        raise Exception("Not implemented!")
+        
+        out_height = int((height - self.pool_size) / self.stride + 1)
+        out_width = int((width - self.pool_size) / self.stride + 1)
+
+        d_result = np.zeros_like(self.X)
+
+        for y in range(out_height):
+            for x in range(out_width):
+                X_slice = self.X[:, y:y + self.pool_size, x:x + self.pool_size, :]
+                grad = d_out[:, y, x, :][:, np.newaxis, np.newaxis, :]
+                mask = (X_slice == np.amax(X_slice, (1, 2))[:, np.newaxis, np.newaxis, :])
+                d_result[:, y:y + self.pool_size, x:x + self.pool_size, :] += grad * mask
+
+        return d_result
 
     def params(self):
         return {}
@@ -283,16 +304,14 @@ class Flattener:
         self.X_shape = None
 
     def forward(self, X):
+        self.X_shape = X.shape
+
         batch_size, height, width, channels = X.shape
 
-        # TODO: Implement forward pass
-        # Layer should return array with dimensions
-        # [batch_size, hight*width*channels]
-        raise Exception("Not implemented!")
+        return X.reshape(batch_size, height * width * channels)
 
     def backward(self, d_out):
-        # TODO: Implement backward pass
-        raise Exception("Not implemented!")
+        return d_out.reshape(self.X_shape)
 
     def params(self):
         # No params!
